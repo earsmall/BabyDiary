@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>우리 가족 육아 일기</title>
+    <title>육아 일기</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -16,7 +16,7 @@
     <section class="auth-gate" id="authGate" aria-label="로그인">
       <div class="auth-card">
         <p class="eyebrow">Private diary</p>
-        <h1>우리 가족 육아 일기</h1>
+        <h1>육아 일기</h1>
         <p>GitHub 계정으로 로그인한 가족만 일기를 읽고 쓸 수 있어요.</p>
         <button class="primary-button" id="loginButton" type="button">GitHub로 로그인</button>
         <p class="auth-status" id="authStatus">로그인 상태를 확인하고 있어요.</p>
@@ -28,7 +28,7 @@
         <header class="brand-block">
           <div>
             <p class="eyebrow">Baby diary</p>
-            <h1>우리 가족 육아 일기</h1>
+            <h1>육아 일기</h1>
           </div>
           <div class="top-actions">
             <button class="icon-button" id="todayButton" type="button" title="오늘로 이동" aria-label="오늘로 이동">
@@ -120,7 +120,7 @@
             </dl>
             <section class="story-view">
               <h3>오늘의 이야기</h3>
-              <p id="viewBody"></p>
+              <div id="viewBody"></div>
             </section>
           </article>
 
@@ -128,7 +128,7 @@
             <div class="meta-grid">
               <label>
                 <span>몸무게</span>
-                <input id="weightInput" type="text" placeholder="예: 3.6kg" />
+                <input id="weightInput" type="text" inputmode="decimal" placeholder="예: 3.6" />
               </label>
               <label>
                 <span>키</span>
@@ -145,11 +145,11 @@
             </div>
 
             <label class="entry-field">
-              <span>오늘의 이야기</span>
+              <span>오늘의 이야기 <small>Markdown</small></span>
               <textarea
                 id="bodyInput"
                 rows="8"
-                placeholder="오늘 기억하고 싶은 장면, 성장 변화, 병원 기록, 귀여웠던 표정과 행동을 남겨보세요."
+                placeholder="예: ## 오늘의 변화&#10;- 수유를 잘했어요&#10;- 낮잠 시간이 길어졌어요&#10;&#10;**기억할 장면**을 남겨보세요."
               ></textarea>
             </label>
 

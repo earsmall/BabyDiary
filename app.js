@@ -84,6 +84,9 @@ document.querySelector("#cancelButton").addEventListener("click", cancelWriting)
 entryForm.addEventListener("submit", saveEntry);
 editButton.addEventListener("click", startWriting);
 deleteButton.addEventListener("click", deleteEntry);
+fields.weight.addEventListener("blur", () => {
+  fields.weight.value = formatWeight(fields.weight.value);
+});
 
 renderAge();
 setAppVisible(false);
@@ -185,11 +188,13 @@ function renderDetail() {
     return;
   }
 
-  viewFields.weight.textContent = entry.weight || "-";
+  viewFields.weight.textContent = formatWeight(entry.weight) || "-";
   viewFields.height.textContent = entry.height || "-";
   viewFields.feeding.textContent = entry.feeding || "-";
   viewFields.sleep.textContent = entry.sleep || "-";
-  viewFields.body.textContent = entry.body || "오늘의 이야기가 아직 비어 있어요.";
+  viewFields.body.innerHTML = entry.body
+    ? renderMarkdown(entry.body)
+    : "오늘의 이야기가 아직 비어 있어요.";
   saveStatus.textContent = entry.updatedAt
     ? `마지막 저장: ${new Date(entry.updatedAt).toLocaleString("ko-KR")}`
     : "";
@@ -231,7 +236,7 @@ async function saveEntry(event) {
 
   const key = toKey(selectedDate);
   const entry = {
-    weight: fields.weight.value.trim(),
+    weight: formatWeight(fields.weight.value),
     height: fields.height.value.trim(),
     feeding: fields.feeding.value.trim(),
     sleep: fields.sleep.value.trim(),
@@ -284,7 +289,7 @@ function goToday() {
 }
 
 function fillForm(entry) {
-  fields.weight.value = entry.weight || "";
+  fields.weight.value = formatWeight(entry.weight) || "";
   fields.height.value = entry.height || "";
   fields.feeding.value = entry.feeding || "";
   fields.sleep.value = entry.sleep || "";
@@ -293,13 +298,13 @@ function fillForm(entry) {
 
 function clearView() {
   Object.values(viewFields).forEach((field) => {
-    field.textContent = "";
+    field.replaceChildren();
   });
 }
 
 function normalizeEntry(entry) {
   return {
-    weight: entry.weight || "",
+    weight: formatWeight(entry.weight),
     height: entry.height || "",
     feeding: entry.feeding || "",
     sleep: entry.sleep || "",
@@ -307,6 +312,74 @@ function normalizeEntry(entry) {
     updatedAt: entry.updatedAt || "",
     updatedBy: entry.updatedBy || "",
   };
+}
+
+function formatWeight(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+
+  const numeric = raw
+    .replace(/,/g, ".")
+    .replace(/\s*kg$/i, "")
+    .trim();
+
+  if (!/^\d+(\.\d+)?$/.test(numeric)) return raw;
+  return `${numeric}kg`;
+}
+
+function renderMarkdown(markdown) {
+  const lines = escapeHtml(markdown).split("\n");
+  const blocks = [];
+  let listItems = [];
+
+  lines.forEach((line) => {
+    const trimmed = line.trim();
+    const listMatch = trimmed.match(/^[-*]\s+(.+)$/);
+
+    if (listMatch) {
+      listItems.push(`<li>${renderInlineMarkdown(listMatch[1])}</li>`);
+      return;
+    }
+
+    flushList();
+
+    if (!trimmed) {
+      blocks.push("");
+    } else if (trimmed.startsWith("### ")) {
+      blocks.push(`<h4>${renderInlineMarkdown(trimmed.slice(4))}</h4>`);
+    } else if (trimmed.startsWith("## ")) {
+      blocks.push(`<h3>${renderInlineMarkdown(trimmed.slice(3))}</h3>`);
+    } else if (trimmed.startsWith("# ")) {
+      blocks.push(`<h2>${renderInlineMarkdown(trimmed.slice(2))}</h2>`);
+    } else {
+      blocks.push(`<p>${renderInlineMarkdown(trimmed)}</p>`);
+    }
+  });
+
+  flushList();
+  return blocks.filter(Boolean).join("");
+
+  function flushList() {
+    if (listItems.length === 0) return;
+    blocks.push(`<ul>${listItems.join("")}</ul>`);
+    listItems = [];
+  }
+}
+
+function renderInlineMarkdown(text) {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.+?)\*/g, "<em>$1</em>")
+    .replace(/`(.+?)`/g, "<code>$1</code>");
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 function addDays(date, days) {

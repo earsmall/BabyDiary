@@ -432,7 +432,34 @@ h1 {
 .story-view p {
   margin: 0;
   line-height: 1.8;
-  white-space: pre-wrap;
+}
+
+.story-view h2,
+.story-view h3,
+.story-view h4 {
+  margin: 16px 0 8px;
+  color: var(--accent-dark);
+  line-height: 1.35;
+}
+
+.story-view h2:first-child,
+.story-view h3:first-child,
+.story-view h4:first-child {
+  margin-top: 0;
+}
+
+.story-view ul {
+  margin: 8px 0 12px;
+  padding-left: 22px;
+  line-height: 1.8;
+}
+
+.story-view code {
+  padding: 2px 6px;
+  color: var(--accent-dark);
+  background: var(--soft);
+  border-radius: 6px;
+  font-size: 0.92em;
 }
 
 .meta-grid {
@@ -449,6 +476,12 @@ label {
 label span {
   color: var(--muted);
   font-size: 0.9rem;
+  font-weight: 800;
+}
+
+label small {
+  color: var(--accent);
+  font-size: 0.78rem;
   font-weight: 800;
 }
 
