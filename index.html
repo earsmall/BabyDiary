@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>우리 가족 육아 일기</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <section class="auth-gate" id="authGate" aria-label="로그인">
+      <div class="auth-card">
+        <p class="eyebrow">Private diary</p>
+        <h1>우리 가족 육아 일기</h1>
+        <p>GitHub 계정으로 로그인한 가족만 일기를 읽고 쓸 수 있어요.</p>
+        <button class="primary-button" id="loginButton" type="button">GitHub로 로그인</button>
+        <p class="auth-status" id="authStatus">로그인 상태를 확인하고 있어요.</p>
+      </div>
+    </section>
+
+    <main class="app-shell is-hidden" id="appShell">
+      <aside class="calendar-pane" aria-label="날짜 선택">
+        <header class="brand-block">
+          <div>
+            <p class="eyebrow">Baby diary</p>
+            <h1>우리 가족 육아 일기</h1>
+          </div>
+          <div class="top-actions">
+            <button class="icon-button" id="todayButton" type="button" title="오늘로 이동" aria-label="오늘로 이동">
+              오늘
+            </button>
+            <button class="icon-button" id="logoutButton" type="button">로그아웃</button>
+          </div>
+        </header>
+
+        <section class="age-panel" aria-label="아기 나이">
+          <div>
+            <span id="dayCount">D+1</span>
+            <p id="monthAge">0개월</p>
+          </div>
+        </section>
+
+        <section class="month-card" aria-label="월간 캘린더">
+          <div class="month-toolbar">
+            <button class="round-button" id="prevMonth" type="button" aria-label="이전 달">‹</button>
+            <h2 id="monthLabel"></h2>
+            <button class="round-button" id="nextMonth" type="button" aria-label="다음 달">›</button>
+          </div>
+
+          <div class="calendar-legend" aria-label="기록 상태 안내">
+            <span><i class="legend-dot filled"></i>기록 있음</span>
+            <span><i class="legend-dot empty"></i>기록 없음</span>
+          </div>
+
+          <div class="weekdays" aria-hidden="true">
+            <span>일</span>
+            <span>월</span>
+            <span>화</span>
+            <span>수</span>
+            <span>목</span>
+            <span>금</span>
+            <span>토</span>
+          </div>
+          <div class="calendar-grid" id="calendarGrid"></div>
+        </section>
+
+        <section class="quick-stats" aria-label="이번 달 기록 요약">
+          <div>
+            <span id="monthCount">0</span>
+            <p>이번 달 기록</p>
+          </div>
+          <div>
+            <span id="totalCount">0</span>
+            <p>전체 기록</p>
+          </div>
+        </section>
+      </aside>
+
+      <section class="content-pane" aria-label="육아일기">
+        <section class="detail-panel" id="detailPanel" aria-label="육아일기 상세">
+          <header class="entry-header">
+            <div>
+              <p class="eyebrow" id="selectedWeekday"></p>
+              <h2 id="selectedDateTitle"></h2>
+            </div>
+            <div class="entry-actions">
+              <button class="primary-button" id="writeButton" type="button">일기 쓰기</button>
+              <button class="secondary-button" id="editButton" type="button">수정</button>
+              <button class="secondary-button danger" id="deleteButton" type="button">삭제</button>
+            </div>
+          </header>
+
+          <div class="detail-empty" id="emptyDetail">
+            <p>저장된 일기를 선택하면 이곳에서 내용을 볼 수 있어요.</p>
+          </div>
+
+          <article class="detail-view" id="detailView">
+            <dl class="detail-grid">
+              <div>
+                <dt>몸무게</dt>
+                <dd id="viewWeight">-</dd>
+              </div>
+              <div>
+                <dt>키</dt>
+                <dd id="viewHeight">-</dd>
+              </div>
+              <div>
+                <dt>수유 / 식사</dt>
+                <dd id="viewFeeding">-</dd>
+              </div>
+              <div>
+                <dt>수면</dt>
+                <dd id="viewSleep">-</dd>
+              </div>
+            </dl>
+            <section class="story-view">
+              <h3>오늘의 이야기</h3>
+              <p id="viewBody"></p>
+            </section>
+          </article>
+
+          <form class="entry-form" id="entryForm">
+            <div class="meta-grid">
+              <label>
+                <span>몸무게</span>
+                <input id="weightInput" type="text" placeholder="예: 3.6kg" />
+              </label>
+              <label>
+                <span>키</span>
+                <input id="heightInput" type="text" placeholder="예: 51cm" />
+              </label>
+              <label>
+                <span>수유 / 식사</span>
+                <input id="feedingInput" type="text" placeholder="예: 모유 6회, 분유 320ml" />
+              </label>
+              <label>
+                <span>수면</span>
+                <input id="sleepInput" type="text" placeholder="예: 낮잠 3시간, 밤잠 8시간" />
+              </label>
+            </div>
+
+            <label class="entry-field">
+              <span>오늘의 이야기</span>
+              <textarea
+                id="bodyInput"
+                rows="8"
+                placeholder="오늘 기억하고 싶은 장면, 성장 변화, 병원 기록, 귀여웠던 표정과 행동을 남겨보세요."
+              ></textarea>
+            </label>
+
+            <div class="form-actions">
+              <button class="secondary-button" id="cancelButton" type="button">취소</button>
+              <button class="primary-button" id="saveButton" type="submit">저장</button>
+            </div>
+          </form>
+
+          <p class="save-line" id="saveStatus"></p>
+        </section>
+      </section>
+    </main>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
