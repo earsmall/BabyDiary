@@ -4,7 +4,6 @@ import {
   getAuth,
   getRedirectResult,
   onAuthStateChanged,
-  signInWithPopup,
   signInWithRedirect,
   signOut,
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
@@ -116,21 +115,10 @@ async function loginWithGithub() {
   if (loginInProgress) return;
   loginInProgress = true;
   loginButton.disabled = true;
-  authStatus.textContent = "GitHub 로그인 창을 여는 중입니다.";
+  authStatus.textContent = "GitHub 로그인 페이지로 이동합니다.";
   try {
-    if (isMobileDevice()) {
-      await signInWithRedirect(auth, provider);
-      return;
-    }
-
-    await signInWithPopup(auth, provider);
+    await signInWithRedirect(auth, provider);
   } catch (error) {
-    if (["auth/popup-blocked", "auth/cancelled-popup-request"].includes(error.code)) {
-      authStatus.textContent = "팝업 로그인이 어려워 페이지 이동 방식으로 다시 시도합니다.";
-      await signInWithRedirect(auth, provider);
-      return;
-    }
-
     authStatus.textContent = `로그인에 실패했어요: ${error.message}`;
     loginInProgress = false;
     loginButton.disabled = false;
@@ -152,10 +140,6 @@ function setAppVisible(isVisible) {
   appShell.classList.toggle("is-hidden", !isVisible);
   loginInProgress = false;
   loginButton.disabled = false;
-}
-
-function isMobileDevice() {
-  return /Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
 async function loadEntriesFromFirestore() {

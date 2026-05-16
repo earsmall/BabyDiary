@@ -428,9 +428,9 @@ h1 {
   border-radius: 8px;
 }
 
-.story-view h3 {
+.story-view > .story-title {
   margin: 0 0 10px;
-  color: #3f4a5c;
+  color: #d12f3f;
   font-size: 1rem;
 }
 
