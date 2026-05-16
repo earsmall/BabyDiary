@@ -2,8 +2,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/fireba
 import {
   GithubAuthProvider,
   getAuth,
+  getRedirectResult,
   onAuthStateChanged,
   signInWithPopup,
+  signInWithRedirect,
   signOut,
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import {
@@ -73,6 +75,7 @@ let selectedDate = stripTime(new Date());
 let visibleMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
 let mode = "empty";
 let currentUser = null;
+let loginInProgress = false;
 
 loginButton.addEventListener("click", loginWithGithub);
 logoutButton.addEventListener("click", () => signOut(auth));
@@ -90,6 +93,7 @@ fields.weight.addEventListener("blur", () => {
 
 renderAge();
 setAppVisible(false);
+handleRedirectResult();
 
 onAuthStateChanged(auth, async (user) => {
   currentUser = user;
@@ -109,17 +113,49 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 async function loginWithGithub() {
+  if (loginInProgress) return;
+  loginInProgress = true;
+  loginButton.disabled = true;
   authStatus.textContent = "GitHub 로그인 창을 여는 중입니다.";
   try {
+    if (isMobileDevice()) {
+      await signInWithRedirect(auth, provider);
+      return;
+    }
+
     await signInWithPopup(auth, provider);
   } catch (error) {
+    if (["auth/popup-blocked", "auth/cancelled-popup-request"].includes(error.code)) {
+      authStatus.textContent = "팝업 로그인이 어려워 페이지 이동 방식으로 다시 시도합니다.";
+      await signInWithRedirect(auth, provider);
+      return;
+    }
+
     authStatus.textContent = `로그인에 실패했어요: ${error.message}`;
+    loginInProgress = false;
+    loginButton.disabled = false;
+  }
+}
+
+async function handleRedirectResult() {
+  try {
+    await getRedirectResult(auth);
+  } catch (error) {
+    authStatus.textContent = `로그인에 실패했어요: ${error.message}`;
+    loginInProgress = false;
+    loginButton.disabled = false;
   }
 }
 
 function setAppVisible(isVisible) {
   authGate.classList.toggle("is-hidden", isVisible);
   appShell.classList.toggle("is-hidden", !isVisible);
+  loginInProgress = false;
+  loginButton.disabled = false;
+}
+
+function isMobileDevice() {
+  return /Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
 async function loadEntriesFromFirestore() {
