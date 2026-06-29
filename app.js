@@ -2,9 +2,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/fireba
 import {
   GithubAuthProvider,
   getAuth,
-  getRedirectResult,
   onAuthStateChanged,
-  signInWithRedirect,
+  signInWithPopup,
   signOut,
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import {
@@ -18,24 +17,12 @@ import {
 
 const firebaseConfig = {
   apiKey: "AIzaSyA_CduKCp2H72IwkJs-EJcQ-sHeKOV5zOk",
-  authDomain: getAuthDomain(),
+  authDomain: "baby-diary-29cf4.firebaseapp.com",
   projectId: "baby-diary-29cf4",
   storageBucket: "baby-diary-29cf4.firebasestorage.app",
   messagingSenderId: "782567796172",
   appId: "1:782567796172:web:3c8278a9347483ffd08169",
 };
-
-function getAuthDomain() {
-  const fallbackDomain = "baby-diary-29cf4.firebaseapp.com";
-  const host = window.location.hostname;
-  const isFirebaseHosting =
-    host === fallbackDomain ||
-    host === "baby-diary-29cf4.web.app" ||
-    host.endsWith(".firebaseapp.com") ||
-    host.endsWith(".web.app");
-
-  return isFirebaseHosting ? host : fallbackDomain;
-}
 
 const BIRTH_DATE = new Date(2026, 4, 11);
 const app = initializeApp(firebaseConfig);
@@ -87,6 +74,7 @@ let visibleMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(),
 let mode = "empty";
 let currentUser = null;
 let loginInProgress = false;
+let authErrorMessage = "";
 
 loginButton.addEventListener("click", loginWithGithub);
 logoutButton.addEventListener("click", () => signOut(auth));
@@ -104,7 +92,7 @@ fields.weight.addEventListener("blur", () => {
 
 renderAge();
 setAppVisible(false);
-initAuthFlow();
+watchAuthState();
 
 function watchAuthState() {
   onAuthStateChanged(auth, async (user) => {
@@ -112,11 +100,12 @@ function watchAuthState() {
   if (!user) {
     entries = {};
     mode = "empty";
-    authStatus.textContent = "GitHub 로그인이 필요합니다.";
+    authStatus.textContent = authErrorMessage || "GitHub 로그인이 필요합니다.";
     setAppVisible(false);
     return;
   }
 
+  authErrorMessage = "";
   authStatus.textContent = "일기를 불러오는 중입니다.";
   setAppVisible(true);
   await loadEntriesFromFirestore();
@@ -125,30 +114,17 @@ function watchAuthState() {
   });
 }
 
-async function initAuthFlow() {
-  await handleRedirectResult();
-  watchAuthState();
-}
-
 async function loginWithGithub() {
   if (loginInProgress) return;
   loginInProgress = true;
   loginButton.disabled = true;
+  authErrorMessage = "";
   authStatus.textContent = "GitHub 로그인 페이지로 이동합니다.";
   try {
-    await signInWithRedirect(auth, provider);
+    await signInWithPopup(auth, provider);
   } catch (error) {
-    authStatus.textContent = `로그인에 실패했어요: ${error.message}`;
-    loginInProgress = false;
-    loginButton.disabled = false;
-  }
-}
-
-async function handleRedirectResult() {
-  try {
-    await getRedirectResult(auth);
-  } catch (error) {
-    authStatus.textContent = `로그인에 실패했어요: ${error.message}`;
+    authErrorMessage = `로그인에 실패했어요: ${error.message}`;
+    authStatus.textContent = authErrorMessage;
     loginInProgress = false;
     loginButton.disabled = false;
   }
