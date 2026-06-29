@@ -18,12 +18,24 @@ import {
 
 const firebaseConfig = {
   apiKey: "AIzaSyA_CduKCp2H72IwkJs-EJcQ-sHeKOV5zOk",
-  authDomain: "baby-diary-29cf4.firebaseapp.com",
+  authDomain: getAuthDomain(),
   projectId: "baby-diary-29cf4",
   storageBucket: "baby-diary-29cf4.firebasestorage.app",
   messagingSenderId: "782567796172",
   appId: "1:782567796172:web:3c8278a9347483ffd08169",
 };
+
+function getAuthDomain() {
+  const fallbackDomain = "baby-diary-29cf4.firebaseapp.com";
+  const host = window.location.hostname;
+  const isFirebaseHosting =
+    host === fallbackDomain ||
+    host === "baby-diary-29cf4.web.app" ||
+    host.endsWith(".firebaseapp.com") ||
+    host.endsWith(".web.app");
+
+  return isFirebaseHosting ? host : fallbackDomain;
+}
 
 const BIRTH_DATE = new Date(2026, 4, 11);
 const app = initializeApp(firebaseConfig);
@@ -92,9 +104,10 @@ fields.weight.addEventListener("blur", () => {
 
 renderAge();
 setAppVisible(false);
-handleRedirectResult();
+initAuthFlow();
 
-onAuthStateChanged(auth, async (user) => {
+function watchAuthState() {
+  onAuthStateChanged(auth, async (user) => {
   currentUser = user;
   if (!user) {
     entries = {};
@@ -109,7 +122,13 @@ onAuthStateChanged(auth, async (user) => {
   await loadEntriesFromFirestore();
   mode = entries[toKey(selectedDate)] ? "view" : "empty";
   render();
-});
+  });
+}
+
+async function initAuthFlow() {
+  await handleRedirectResult();
+  watchAuthState();
+}
 
 async function loginWithGithub() {
   if (loginInProgress) return;
