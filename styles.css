@@ -344,6 +344,40 @@ h1 {
   min-height: 0;
 }
 
+.content-stack {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.top-menu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px;
+  background: rgba(251, 253, 255, 0.95);
+  border: 1px solid rgba(216, 228, 242, 0.96);
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(25, 64, 116, 0.1);
+}
+
+.menu-button {
+  min-height: 40px;
+  padding: 0 16px;
+  color: var(--accent-dark);
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  font-weight: 800;
+}
+
+.menu-button.is-active {
+  color: white;
+  background: var(--accent);
+}
+
 .detail-panel {
   display: flex;
   flex: 1;
@@ -535,6 +569,61 @@ textarea:focus {
   gap: 10px;
 }
 
+.board-list {
+  display: grid;
+  gap: 10px;
+}
+
+.board-row {
+  display: grid;
+  grid-template-columns: 128px minmax(140px, 0.95fr) minmax(180px, 1.4fr) 112px;
+  gap: 14px;
+  align-items: center;
+  width: 100%;
+  min-height: 62px;
+  padding: 13px 16px;
+  color: var(--ink);
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  text-align: left;
+}
+
+.board-row:hover,
+.board-row:focus-visible {
+  border-color: var(--accent-light);
+  box-shadow: 0 0 0 3px rgba(30, 99, 182, 0.1);
+  outline: none;
+}
+
+.board-date,
+.board-meta {
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.board-title {
+  font-weight: 800;
+}
+
+.board-summary {
+  color: var(--muted);
+}
+
+.board-date,
+.board-title,
+.board-summary,
+.board-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.board-empty {
+  min-height: 190px;
+}
+
 .is-hidden {
   display: none !important;
 }
@@ -575,5 +664,28 @@ textarea:focus {
 
   .form-actions {
     width: 100%;
+  }
+
+  .top-menu {
+    position: sticky;
+    top: 8px;
+    z-index: 3;
+  }
+
+  .menu-button {
+    flex: 1;
+    min-width: 90px;
+  }
+
+  .board-row {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .board-date,
+  .board-title,
+  .board-summary,
+  .board-meta {
+    white-space: normal;
   }
 }

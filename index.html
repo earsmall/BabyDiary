@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=20260718-board-memo" />
   </head>
   <body>
     <section class="auth-gate" id="authGate" aria-label="로그인">
@@ -82,6 +82,13 @@
       </aside>
 
       <section class="content-pane" aria-label="육아일기">
+        <div class="content-stack">
+          <nav class="top-menu" aria-label="상단 메뉴">
+            <button class="menu-button is-active" id="calendarViewButton" type="button">캘린더</button>
+            <button class="menu-button" id="diaryListButton" type="button">일기 목록</button>
+            <button class="menu-button" id="memoMenuButton" type="button">메모</button>
+          </nav>
+
         <section class="detail-panel" id="detailPanel" aria-label="육아일기 상세">
           <header class="entry-header">
             <div>
@@ -161,9 +168,67 @@
 
           <p class="save-line" id="saveStatus"></p>
         </section>
+
+          <section class="detail-panel is-hidden" id="diaryListPanel" aria-label="육아일기 목록">
+            <header class="entry-header">
+              <div>
+                <p class="eyebrow">Diary board</p>
+                <h2>육아일기 목록</h2>
+              </div>
+            </header>
+            <div class="board-list" id="diaryBoardList"></div>
+          </section>
+
+          <section class="detail-panel is-hidden" id="memoPanel" aria-label="메모 게시판">
+            <header class="entry-header">
+              <div>
+                <p class="eyebrow">Memo board</p>
+                <h2 id="memoPanelTitle">메모</h2>
+              </div>
+              <div class="entry-actions">
+                <button class="primary-button" id="newMemoButton" type="button">글쓰기</button>
+                <button class="secondary-button" id="editMemoButton" type="button">수정</button>
+                <button class="secondary-button danger" id="deleteMemoButton" type="button">삭제</button>
+                <button class="secondary-button" id="memoListButton" type="button">목록</button>
+              </div>
+            </header>
+
+            <div class="board-list" id="memoBoardList"></div>
+
+            <article class="detail-view is-hidden" id="memoDetailView">
+              <p class="save-line" id="memoMetaLine"></p>
+              <section class="story-view">
+                <div id="memoViewBody"></div>
+              </section>
+            </article>
+
+            <form class="entry-form is-hidden" id="memoForm">
+              <label>
+                <span>제목</span>
+                <input id="memoTitleInput" type="text" placeholder="메모 제목" />
+              </label>
+
+              <label class="entry-field">
+                <span>내용 <small>Markdown</small></span>
+                <textarea
+                  id="memoBodyInput"
+                  rows="12"
+                  placeholder="예: ## 메모 제목&#10;- 기억할 것&#10;- 준비할 것&#10;&#10;**중요한 내용**을 남겨보세요."
+                ></textarea>
+              </label>
+
+              <div class="form-actions">
+                <button class="secondary-button" id="cancelMemoButton" type="button">취소</button>
+                <button class="primary-button" type="submit">저장</button>
+              </div>
+            </form>
+
+            <p class="save-line" id="memoStatus"></p>
+          </section>
+        </div>
       </section>
     </main>
 
-    <script type="module" src="app.js?v=20260629-popup-login"></script>
+    <script type="module" src="app.js?v=20260718-board-memo"></script>
   </body>
 </html>
