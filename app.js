@@ -301,15 +301,13 @@ function renderDiaryList() {
     return;
   }
 
-  diaryItems.forEach(([key, entry]) => {
+  diaryItems.forEach(([key]) => {
     const row = document.createElement("button");
     const date = parseKey(key);
     row.type = "button";
-    row.className = "board-row";
+    row.className = "board-row diary-board-row";
     row.innerHTML = `
       <span class="board-date">${formatLongDate(date)}</span>
-      <span class="board-title">${escapeHtml(getDiaryTitle(entry))}</span>
-      <span class="board-summary">${escapeHtml(getDiarySummary(entry))}</span>
       <span class="board-meta">${getAgeLabel(date)}</span>
     `;
     row.addEventListener("click", () => {
@@ -380,7 +378,7 @@ function renderMemo() {
 
 function renderAge() {
   dayCount.textContent = getDayLabel(new Date());
-  monthAge.textContent = getMonthLabel(new Date());
+  monthAge.textContent = `${getWeekLabel(new Date())} · ${getMonthLabel(new Date())}`;
 }
 
 function selectDate(date, nextMode) {
@@ -759,8 +757,13 @@ function getMonthLabel(date) {
   return `${Math.max(months, 0)}개월`;
 }
 
+function getWeekLabel(date) {
+  const dayNumber = daysBetween(BIRTH_DATE, stripTime(date)) + 1;
+  return `${Math.max(Math.ceil(dayNumber / 7), 1)}주차`;
+}
+
 function getAgeLabel(date) {
-  return `${getDayLabel(date)} · ${getMonthLabel(date)}`;
+  return `${getDayLabel(date)} · ${getWeekLabel(date)} · ${getMonthLabel(date)}`;
 }
 
 function daysBetween(start, end) {

@@ -589,6 +589,14 @@ textarea:focus {
   text-align: left;
 }
 
+.diary-board-row {
+  grid-template-columns: minmax(180px, 1fr) max-content;
+}
+
+.diary-board-row .board-meta {
+  text-align: right;
+}
+
 .board-row:hover,
 .board-row:focus-visible {
   border-color: var(--accent-light);
@@ -680,6 +688,14 @@ textarea:focus {
   .board-row {
     grid-template-columns: 1fr;
     gap: 5px;
+  }
+
+  .diary-board-row {
+    grid-template-columns: 1fr;
+  }
+
+  .diary-board-row .board-meta {
+    text-align: left;
   }
 
   .board-date,
