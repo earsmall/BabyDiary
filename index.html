@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260718-board-memo-3" />
+    <link rel="stylesheet" href="styles.css?v=20260718-pagination-search" />
   </head>
   <body>
     <section class="auth-gate" id="authGate" aria-label="로그인">
@@ -176,7 +176,18 @@
                 <h2>육아일기 목록</h2>
               </div>
             </header>
+            <form class="board-filters" id="diarySearchForm" role="search">
+              <label><span>시작일</span><input id="diaryStartDate" type="date" /></label>
+              <label><span>종료일</span><input id="diaryEndDate" type="date" /></label>
+              <label class="board-keyword-field">
+                <span>내용 검색</span>
+                <input id="diaryKeyword" type="search" placeholder="일기 내용의 키워드" />
+              </label>
+              <button class="secondary-button" id="clearDiarySearchButton" type="button">초기화</button>
+            </form>
+            <p class="board-result-count" id="diaryResultCount" aria-live="polite"></p>
             <div class="board-list" id="diaryBoardList"></div>
+            <nav class="pagination" id="diaryPagination" aria-label="일기 목록 페이지"></nav>
           </section>
 
           <section class="detail-panel is-hidden" id="memoPanel" aria-label="메모 게시판">
@@ -194,6 +205,7 @@
             </header>
 
             <div class="board-list" id="memoBoardList"></div>
+            <nav class="pagination" id="memoPagination" aria-label="메모 목록 페이지"></nav>
 
             <article class="detail-view is-hidden" id="memoDetailView">
               <p class="save-line" id="memoMetaLine"></p>
@@ -229,6 +241,6 @@
       </section>
     </main>
 
-    <script type="module" src="app.js?v=20260718-board-memo-3"></script>
+    <script type="module" src="app.js?v=20260718-pagination-search"></script>
   </body>
 </html>

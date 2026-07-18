@@ -581,6 +581,41 @@ textarea:focus {
   gap: 10px;
 }
 
+.board-filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(140px, 0.55fr)) minmax(200px, 1.4fr) auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 10px;
+}
+
+.board-filters label { display: grid; gap: 6px; }
+.board-filters label span,
+.board-result-count { color: var(--muted); font-size: 0.86rem; font-weight: 800; }
+.board-result-count { margin: 0 0 12px; }
+
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 18px;
+}
+
+.pagination-button {
+  min-width: 40px;
+  min-height: 40px;
+  padding: 7px 11px;
+  color: var(--ink);
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-weight: 800;
+}
+
+.pagination-button.is-current { color: white; background: var(--accent); border-color: var(--accent); }
+.pagination-button:disabled { cursor: default; opacity: 0.42; }
+
 .board-row {
   display: grid;
   grid-template-columns: 128px minmax(140px, 0.95fr) minmax(180px, 1.4fr) 112px;
@@ -595,6 +630,8 @@ textarea:focus {
   border-radius: 8px;
   text-align: left;
 }
+
+#memoBoardList .board-row { grid-template-columns: 128px minmax(0, 1fr); }
 
 .diary-board-row {
   grid-template-columns: minmax(180px, 1fr) max-content;
@@ -696,6 +733,12 @@ textarea:focus {
     grid-template-columns: 1fr;
     gap: 5px;
   }
+
+  .board-filters { grid-template-columns: 1fr 1fr; }
+  .board-keyword-field,
+  .board-filters .secondary-button { grid-column: 1 / -1; }
+
+  #memoBoardList .board-row { grid-template-columns: 96px minmax(0, 1fr); }
 
   .diary-board-row {
     grid-template-columns: 1fr;

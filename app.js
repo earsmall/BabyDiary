@@ -44,6 +44,13 @@ const detailPanel = document.querySelector("#detailPanel");
 const diaryListPanel = document.querySelector("#diaryListPanel");
 const memoPanel = document.querySelector("#memoPanel");
 const diaryBoardList = document.querySelector("#diaryBoardList");
+const diarySearchForm = document.querySelector("#diarySearchForm");
+const diaryStartDate = document.querySelector("#diaryStartDate");
+const diaryEndDate = document.querySelector("#diaryEndDate");
+const diaryKeyword = document.querySelector("#diaryKeyword");
+const clearDiarySearchButton = document.querySelector("#clearDiarySearchButton");
+const diaryResultCount = document.querySelector("#diaryResultCount");
+const diaryPagination = document.querySelector("#diaryPagination");
 const selectedWeekday = document.querySelector("#selectedWeekday");
 const selectedDateTitle = document.querySelector("#selectedDateTitle");
 const monthCount = document.querySelector("#monthCount");
@@ -59,6 +66,7 @@ const editButton = document.querySelector("#editButton");
 const deleteButton = document.querySelector("#deleteButton");
 const memoPanelTitle = document.querySelector("#memoPanelTitle");
 const memoBoardList = document.querySelector("#memoBoardList");
+const memoPagination = document.querySelector("#memoPagination");
 const memoDetailView = document.querySelector("#memoDetailView");
 const memoMetaLine = document.querySelector("#memoMetaLine");
 const memoViewBody = document.querySelector("#memoViewBody");
@@ -104,6 +112,10 @@ let currentUser = null;
 let loginInProgress = false;
 let authErrorMessage = "";
 let memoLoadError = "";
+let diaryPage = 1;
+let memoPage = 1;
+const DIARY_PAGE_SIZE = 20;
+const MEMO_PAGE_SIZE = 10;
 
 loginButton.addEventListener("click", loginWithGithub);
 logoutButton.addEventListener("click", () => signOut(auth));
@@ -112,7 +124,10 @@ document.querySelector("#nextMonth").addEventListener("click", () => changeMonth
 document.querySelector("#todayButton").addEventListener("click", goToday);
 calendarViewButton.addEventListener("click", () => switchView("calendar"));
 diaryListButton.addEventListener("click", () => switchView("diaryList"));
-memoMenuButton.addEventListener("click", () => switchView("memo"));
+memoMenuButton.addEventListener("click", () => {
+  showMemoList();
+  switchView("memo");
+});
 writeButton.addEventListener("click", startWriting);
 document.querySelector("#cancelButton").addEventListener("click", cancelWriting);
 entryForm.addEventListener("submit", saveEntry);
@@ -124,6 +139,18 @@ deleteMemoButton.addEventListener("click", deleteMemo);
 memoListButton.addEventListener("click", showMemoList);
 cancelMemoButton.addEventListener("click", cancelMemoWriting);
 memoForm.addEventListener("submit", saveMemo);
+diarySearchForm.addEventListener("submit", (event) => event.preventDefault());
+[diaryStartDate, diaryEndDate, diaryKeyword].forEach((field) => {
+  field.addEventListener("input", () => {
+    diaryPage = 1;
+    renderDiaryList();
+  });
+});
+clearDiarySearchButton.addEventListener("click", () => {
+  diarySearchForm.reset();
+  diaryPage = 1;
+  renderDiaryList();
+});
 fields.weight.addEventListener("blur", () => {
   fields.weight.value = formatWeight(fields.weight.value);
 });
@@ -293,15 +320,23 @@ function renderStats() {
 }
 
 function renderDiaryList() {
-  const diaryItems = getSortedDiaryItems();
+  const diaryItems = getFilteredDiaryItems();
+  const totalPages = Math.max(1, Math.ceil(diaryItems.length / DIARY_PAGE_SIZE));
+  diaryPage = Math.min(diaryPage, totalPages);
+  const pageItems = diaryItems.slice((diaryPage - 1) * DIARY_PAGE_SIZE, diaryPage * DIARY_PAGE_SIZE);
   diaryBoardList.replaceChildren();
+  diaryResultCount.textContent = `검색 결과 ${diaryItems.length}개`;
+  renderPagination(diaryPagination, diaryPage, totalPages, (page) => {
+    diaryPage = page;
+    renderDiaryList();
+  });
 
   if (diaryItems.length === 0) {
-    diaryBoardList.appendChild(createEmptyBoard("아직 저장된 육아일기가 없어요."));
+    diaryBoardList.appendChild(createEmptyBoard("검색 조건에 맞는 일기가 없어요."));
     return;
   }
 
-  diaryItems.forEach(([key]) => {
+  pageItems.forEach(([key]) => {
     const row = document.createElement("button");
     const date = parseKey(key);
     row.type = "button";
@@ -323,6 +358,7 @@ function renderMemo() {
   const selectedMemo = selectedMemoId ? memos[selectedMemoId] : null;
 
   memoBoardList.classList.toggle("is-hidden", memoMode !== "list");
+  memoPagination.classList.toggle("is-hidden", memoMode !== "list");
   memoDetailView.classList.toggle("is-hidden", memoMode !== "view" || !selectedMemo);
   memoForm.classList.toggle("is-hidden", memoMode !== "write");
   newMemoButton.classList.toggle("is-hidden", memoMode === "write");
@@ -334,21 +370,27 @@ function renderMemo() {
     memoPanelTitle.textContent = "메모";
     memoStatus.textContent = memoLoadError;
     memoBoardList.replaceChildren();
+    const totalPages = Math.max(1, Math.ceil(memoItems.length / MEMO_PAGE_SIZE));
+    memoPage = Math.min(memoPage, totalPages);
+    renderPagination(memoPagination, memoPage, totalPages, (page) => {
+      memoPage = page;
+      renderMemo();
+    });
 
     if (memoItems.length === 0) {
       memoBoardList.appendChild(createEmptyBoard("아직 등록된 메모가 없어요."));
       return;
     }
 
-    memoItems.forEach(([id, memo]) => {
+    memoItems
+      .slice((memoPage - 1) * MEMO_PAGE_SIZE, memoPage * MEMO_PAGE_SIZE)
+      .forEach(([id, memo]) => {
       const row = document.createElement("button");
       row.type = "button";
       row.className = "board-row";
       row.innerHTML = `
         <span class="board-date">${formatShortDate(memo.createdAt || memo.updatedAt)}</span>
         <span class="board-title">${escapeHtml(memo.title || "제목 없음")}</span>
-        <span class="board-summary">${escapeHtml(getPlainText(memo.body) || "내용 없음")}</span>
-        <span class="board-meta">${formatShortDateTime(memo.updatedAt)}</span>
       `;
       row.addEventListener("click", () => selectMemo(id));
       memoBoardList.appendChild(row);
@@ -523,6 +565,7 @@ function cancelMemoWriting() {
 function showMemoList() {
   memoMode = "list";
   selectedMemoId = "";
+  memoPage = 1;
   renderMemo();
 }
 
@@ -592,6 +635,50 @@ function fillMemoForm(memo) {
 
 function getSortedDiaryItems() {
   return Object.entries(entries).sort(([left], [right]) => right.localeCompare(left));
+}
+
+function getFilteredDiaryItems() {
+  const startDate = diaryStartDate.value;
+  const endDate = diaryEndDate.value;
+  const keyword = diaryKeyword.value.trim().toLocaleLowerCase("ko-KR");
+
+  return getSortedDiaryItems().filter(([key, entry]) => {
+    if (startDate && key < startDate) return false;
+    if (endDate && key > endDate) return false;
+    if (!keyword) return true;
+    const searchableText = [entry.body, entry.weight, entry.height, entry.feeding, entry.sleep]
+      .filter(Boolean)
+      .join(" ")
+      .toLocaleLowerCase("ko-KR");
+    return searchableText.includes(keyword);
+  });
+}
+
+function renderPagination(container, currentPage, totalPages, onPageChange) {
+  container.replaceChildren();
+  if (totalPages <= 1) return;
+
+  const addButton = (label, page, options = {}) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "pagination-button";
+    button.textContent = label;
+    button.disabled = options.disabled || false;
+    if (options.current) {
+      button.classList.add("is-current");
+      button.setAttribute("aria-current", "page");
+    }
+    button.addEventListener("click", () => onPageChange(page));
+    container.appendChild(button);
+  };
+
+  addButton("이전", currentPage - 1, { disabled: currentPage === 1 });
+  const firstPage = Math.max(1, Math.min(currentPage - 2, totalPages - 4));
+  const lastPage = Math.min(totalPages, firstPage + 4);
+  for (let page = firstPage; page <= lastPage; page += 1) {
+    addButton(String(page), page, { current: page === currentPage });
+  }
+  addButton("다음", currentPage + 1, { disabled: currentPage === totalPages });
 }
 
 function getSortedMemoItems() {
