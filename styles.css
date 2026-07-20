@@ -633,6 +633,9 @@ textarea:focus {
 
 #memoBoardList .board-row { grid-template-columns: 128px minmax(0, 1fr); }
 
+/* 메모 목록에서는 화면 크기와 관계없이 작성일과 제목만 표시한다. */
+#memoBoardList .board-summary { display: none; }
+
 .diary-board-row {
   grid-template-columns: minmax(180px, 1fr) max-content;
 }
